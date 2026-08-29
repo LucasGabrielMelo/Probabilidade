@@ -1,5 +1,6 @@
 import numpy as np
-from scipy.stats import poisson
+from scipy.stats import poisson, uniform
+from scipy.integrate import quad
 
 ## Funções matemáticas
 
@@ -17,6 +18,25 @@ def binomial(n,k):
     num = fatorial(n)
     den = fatorial(k)*fatorial(n-k)
     return num/den
+
+def integrando_funcao_Gamma(x,z):
+    exp = np.exp(-x)
+    polinomio = np.power(x, z-1)
+    return polinomio * exp
+
+def funcao_Gamma(Z):
+    if np.isscalar(Z):
+        Z = np.array([Z])
+    resultados = []
+    for z in Z:
+        def f(x):
+            return integrando_funcao_Gamma(x,z)
+        resultado, erro = quad(f,0,np.inf)
+        resultados.append(resultado)
+    resultados = np.array(resultados)
+    if len(resultados) == 1:
+        return resultados[0]
+    return resultados
 
 ## Eventos aleatórios discretos
 
@@ -53,7 +73,7 @@ def Poisson(lambda_):
     
     return np.random.poisson(lam = lambda_)
 
-## Distribuições de probabilidade discretas
+## Distribuições de probabilidades discretas
 
 def prob_Bin(n,p,k):
     bin = binomial(n,k)
@@ -74,7 +94,7 @@ def prob_Poisson(lambda_, k):
 def prob_Geom(p, k):
     return p*(1-p)**(k-1)
 
-## Distribuições de probabilidade contínuas
+## Distribuições de probabilidades contínuas
 
 def prob_Gaussiana(t, mu, sigma2):
     sigma = np.sqrt(sigma2)
